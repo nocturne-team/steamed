@@ -5,6 +5,7 @@ import com.codedisaster.steamworks.SteamID
 import com.codedisaster.steamworks.SteamMatchmaking
 import com.codedisaster.steamworks.SteamNativeHandle
 import net.minecraft.SharedConstants
+import xyz.kkaii.steamed.net.ViaFabricIntegration
 import xyz.kkaii.steamed.platform.Services
 import java.util.concurrent.ConcurrentHashMap
 
@@ -27,7 +28,9 @@ object FriendLobbies {
         val mcProtocol: String,
     ) {
         val sameMinecraft: Boolean get() = sameMinecraft(mcProtocol)
-        val compatible: Boolean get() = version == Services.PLATFORM.modVersion() && sameMinecraft
+        // A different protocol doesn't need blocking when the joiner has ViaFabric: it can be handed the host's
+        // protocol directly instead of auto-pinging (see ViaFabricIntegration).
+        val compatible: Boolean get() = version == Services.PLATFORM.modVersion() && (sameMinecraft || ViaFabricIntegration.isInstalled())
     }
 
     // Lobbies from before these keys existed don't say; Minecraft's own handshake still catches a mismatch.

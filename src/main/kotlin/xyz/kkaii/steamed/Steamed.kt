@@ -5,6 +5,7 @@ package xyz.kkaii.steamed
 
 import com.codedisaster.steamworks.*
 import net.minecraft.ChatFormatting
+import net.minecraft.SharedConstants
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.DisconnectedScreen
 import net.minecraft.client.gui.screens.TitleScreen
@@ -342,6 +343,11 @@ object Steamed {
         val hostName = friends?.getFriendPersonaName(hostSteamId) ?: I18n.get("steamed.host.unknown")
         LOGGER.info("Connecting to host {} ({}) over Steam P2P", hostName, hostSteamId.accountID)
 
+        // Known now, before the handshake, so a ViaFabric joiner can be handed it directly instead of auto-pinging.
+        val hostProtocol = if (lobbyId.isSome())
+            matchmaking?.getLobbyData(lobbyId.unwrap(), FriendLobbies.MC_PROTOCOL_KEY)?.toIntOrNull()
+        else null
+
         val instance: Minecraft = Minecraft.getInstance()
         instance.execute {
             val current = instance.currentScreen()
@@ -358,7 +364,7 @@ object Steamed {
             hostSteamId,
             onAccepted = { payload ->
                 val voicePorts = VoicePorts.decode(payload)
-                openBridgeToHost(relay, hostSteamId, hostName, voicePorts)
+                openBridgeToHost(relay, hostSteamId, hostName, voicePorts, hostProtocol)
             },
             onDenied = { reason ->
                 LOGGER.warn("Host {} refused the connection: {}", hostSteamId.accountID, reason)
@@ -376,7 +382,13 @@ object Steamed {
         )
     }
 
-    private fun openBridgeToHost(relay: SteamP2PRelay, hostSteamId: SteamID, hostName: String, voicePorts: List<Int>) {
+    private fun openBridgeToHost(
+        relay: SteamP2PRelay,
+        hostSteamId: SteamID,
+        hostName: String,
+        voicePorts: List<Int>,
+        hostProtocol: Int?,
+    ) {
         val serverSocket = ServerSocket(0, 1, InetAddress.getLoopbackAddress())
         val localPort = serverSocket.localPort
 
@@ -414,9 +426,15 @@ object Steamed {
             }
         }
 
+        // A mismatched protocol is handed to ViaFabric via its address-suffix convention instead of letting its own
+        // auto-detect ping use up this bridge's single accept (see ViaFabricIntegration).
+        val host = if (hostProtocol != null && hostProtocol != SharedConstants.getProtocolVersion() && ViaFabricIntegration.isInstalled())
+            ViaFabricIntegration.suffixedAddress("127.0.0.1", hostProtocol)
+        else "127.0.0.1"
+
         val instance: Minecraft = Minecraft.getInstance()
         instance.execute {
-            val address = ServerAddress("127.0.0.1", localPort)
+            val address = ServerAddress(host, localPort)
             val serverData = lanServerData(LOBBY_SERVER_NAME, "127.0.0.1:$localPort")
             val current = instance.currentScreen()
             val parent =
@@ -482,8 +500,11 @@ object Steamed {
         }
 
         // Invites skip the lobby list's check, so catch a different Minecraft here, before the auth handshake.
+        // ViaFabric can be handed the host's protocol directly instead (see ViaFabricIntegration), so it isn't blocked.
         val lobby = lobbyId.unwrap()
-        if (!FriendLobbies.sameMinecraft(matchmaking?.getLobbyData(lobby, FriendLobbies.MC_PROTOCOL_KEY))) {
+        if (!FriendLobbies.sameMinecraft(matchmaking?.getLobbyData(lobby, FriendLobbies.MC_PROTOCOL_KEY)) &&
+            !ViaFabricIntegration.isInstalled()
+        ) {
             val hostVersion = matchmaking?.getLobbyData(lobby, FriendLobbies.MC_VERSION_KEY).orEmpty()
             LOGGER.warn("Host is on Minecraft {}, not joining", hostVersion)
             Minecraft.getInstance().execute {

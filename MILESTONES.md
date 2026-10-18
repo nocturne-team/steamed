@@ -589,9 +589,18 @@ not, members fall back to the old timeout), and friends-list "Join Game".
 - [x] Lobbies carry the host's Minecraft version and protocol (`mc_version`/`mc_protocol`, 2026-10-17). The lobby list
   greys out a different protocol, and `joinHostedLobby` refuses one before the auth handshake (invites skip the list).
   Needed once backports exist: Steamed's own version alone would let a 26.2 and a 1.21 player try to connect
-- [ ] ViaFabric support: with it installed, a different `mc_protocol` shouldn't block joining. Its `auto` mode pings the
-  server first to learn the protocol, which would use up the joiner's single-accept loopback bridge, so Steamed should
-  hand ViaFabric the lobby's `mc_protocol` for that connection instead
+- [ ] ViaFabric support (2026-10-18): with it installed, a different `mc_protocol` no longer blocks joining —
+  `FriendLobbies.Hosted.compatible` and `joinHostedLobby`'s pre-handshake gate both let a mismatch through when
+  `ViaFabricIntegration.isInstalled()`. Rather than letting ViaFabric's `auto` mode ping the server first (which would
+  use up the joiner's single-accept loopback bridge), `openBridgeToHost` hands it the lobby's `mc_protocol` directly by
+  suffixing the loopback address (`127.0.0.1._v<protocol>.viafabric`). Verified against ViaFabric 0.4.22+186-26.x's
+  real decompiled source (downloaded from Modrinth, decompiled with the project's own cached Vineflower jar), not
+  assumed from its public docs: `AddressParser` strips that suffix before actual resolution (works on a literal
+  loopback IP, not just a hostname) and re-attaches it to the resolved address; `AbstractFabricVersionProvider`
+  reads it off the channel's remote address to skip auto-detection. `./gradlew build` passes on every node with this
+  change
+- [ ] Live test: an actual joiner running ViaFabric connecting to a host on a different Minecraft version — the
+  mechanism is verified against ViaFabric's real source, not against a real two-account ViaFabric join
 
 - [ ] Actually host/join a lobby on the NeoForge build specifically, not just verify Steam init + mixins load. Hosting
   works on a real install (2026-10-17, Prism, NeoForge 26.2.0.93 + KFF 6.4.0); joining still needs a second account
