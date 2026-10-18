@@ -1,20 +1,20 @@
 # Steamed
 
-Client-side Fabric + NeoForge (+ Quilt on 26.2, Forge on 1.20.1) mod that lets players host and join Minecraft worlds through Steam lobbies (Steamworks via
+Client-side Fabric + NeoForge (+ Quilt on 26.x, Forge on 1.20.1) mod that lets players host and join Minecraft worlds through Steam lobbies (Steamworks via
 steamworks4j). Progress and plans are in `milestones.md`.
 
 ## Stack
 
-- Minecraft 26.2 (Java 25; Fabric, NeoForge, Quilt), 1.21.1 (Java 21; Fabric, NeoForge) and 1.20.1 (Java 17; Fabric,
-  Forge). Nodes: `26.2-fabric`, `26.2-neoforge`, `26.2-quilt`, `1.21.1-fabric`, `1.21.1-neoforge`, `1.20.1-fabric`,
-  `1.20.1-forge`
+- Minecraft 26.3 and 26.2 (Java 25; Fabric, NeoForge, Quilt), 1.21.1 (Java 21; Fabric, NeoForge) and 1.20.1 (Java 17; Fabric,
+  Forge). Nodes: `26.3-fabric`, `26.3-neoforge`, `26.3-quilt`, `26.2-fabric`, `26.2-neoforge`, `26.2-quilt`,
+  `1.21.1-fabric`, `1.21.1-neoforge`, `1.20.1-fabric`, `1.20.1-forge`
 - Kotlin 2.4.20 for logic, Java only for mixins (and nothing past Java 17: 1.20.1 builds with Java 17)
 - Multi-loader and multi-version: Stonecutter 0.9.8 nodes named `<mc>-<loader>` over one `src/` tree, set up after
   Multicutter's layout (`pajicadvance/multicutter` at `bf13a3b`); Fabric and Quilt go through `dev.kikugie.loom-back-compat`
   (Fabric Loom 1.18.2). Nodes are declared in `settings.gradle.kts`; each loader has its own `build.<loader>.gradle.kts`
 - Fabric: Fabric Loader 0.19.5, Fabric API (required: nothing imports it, but its resource loader is what loads
   `assets/steamed`; neither Fabric nor Quilt Loader do that alone), Fabric Language Kotlin, `net.fabricmc.fabric-loom`
-- NeoForge: NeoForge 26.2.0.88 / 21.1.262, `net.neoforged.moddev` (ModDevGradle), Kotlin for Forge (required at runtime: nothing
+- NeoForge: NeoForge 26.3.0.88 / 26.2.0.88 / 21.1.262, `net.neoforged.moddev` (ModDevGradle), Kotlin for Forge (required at runtime: nothing
   else provides the Kotlin stdlib, and `runClient` hides that since Gradle puts it on the classpath)
 - Forge (1.20.1 only): Forge 47.4.28 through ModDevGradle's `net.neoforged.moddev.legacyforge` (`build.forge.gradle.kts`),
   Kotlin for Forge 4.12.0. KFF 4.12 is the last for 1.20.1 and ships the Kotlin 2.2 stdlib, so this node compiles with
@@ -176,6 +176,13 @@ Base package `xyz.kkaii.steamed` throughout. One source tree, `src/main/{kotlin,
   Loom's cache (`find ~/.gradle/caches -name '*26.2*sources*.jar'`) (much faster than reconstructing signatures from
   `javap`). Both loaders build against the same official-mapped vanilla Minecraft, so signatures found this way apply to
   both
+- 26.3 replaces GLFW with SDL for windowing (`com.mojang.blaze3d.platform.Window`'s `handle` is now an SDL window
+  handle, not a GLFW one). `Compat26.kt`'s `>=26.3`/else split handles this per call site (so far just
+  `appendTitle`/`publishForSteam`); a new GLFW-touching call added later needs the same split. Verified against real
+  decompiled 26.3 source (NeoForge's `minecraft-patched-*-sources.jar` under `versions/<node>/build/moddev/artifacts/`,
+  since Fabric Loom's own `genSourcesWithVineflower` output isn't a discoverable standalone jar) — `SDLVideo` has no
+  `getTitle`-style method on `Window` itself, but the raw `SDLVideo.SDL_GetWindowTitle(long): String` binding exists
+  and is what the compat code calls directly
 - 1.20.1 predates a lot of the GUI the screens use, so `Compat1_20_1.kt` fills in: no GUI sprite atlas (`spriteButton`
   blits `textures/gui/sprites/*.png` directly), `LinearLayout` distributes over a fixed length instead of spacing (so
   `flowRow`/`flowColumn` are one-line `GridLayout`s there), selection lists aren't layout elements (`addList`/`fitList`

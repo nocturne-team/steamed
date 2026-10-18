@@ -38,7 +38,11 @@ import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.ARGB
 import net.minecraft.world.item.component.ResolvableProfile
+//? if >=26.3 {
+/*import org.lwjgl.sdl.SDLVideo
+*///?} else {
 import org.lwjgl.glfw.GLFW
+//?}
 
 typealias Graphics = GuiGraphicsExtractor
 typealias ToastId = SystemToast.SystemToastId
@@ -70,7 +74,11 @@ fun Minecraft.toast(id: ToastId, title: Component, message: Component?) =
     SystemToast.addOrUpdate(gui.toastManager(), id, title, message)
 fun Minecraft.disconnectTo(screen: Screen) = disconnect(screen, false)
 fun Minecraft.leaveWorld(reason: Component) = disconnectFromWorld(reason)
+//? if >=26.3 {
+/*fun Minecraft.appendTitle(suffix: String) = window.setTitle(SDLVideo.SDL_GetWindowTitle(window.handle()) + suffix)
+*///?} else {
 fun Minecraft.appendTitle(suffix: String) = window.setTitle(GLFW.glfwGetWindowTitle(window.handle()) + suffix)
+//?}
 
 fun Screen.pressKey(key: Int): Boolean = keyPressed(KeyEvent(key, 0, 0))
 fun AbstractWidget.draw(graphics: Graphics, mouseX: Int, mouseY: Int, a: Float) =
@@ -86,8 +94,13 @@ fun fontStyle(font: Identifier): Style = Style.EMPTY.withFont(FontDescription.Re
 fun Style.opensUrl(url: String, hover: Component): Style =
     withClickEvent(ClickEvent.OpenUrl(URI(url))).withHoverEvent(HoverEvent.ShowText(hover))
 
+//? if >=26.3 {
+/*fun publishForSteam(server: IntegratedServer, port: Int): Boolean =
+    server.publishServer(MinecraftServer.MultiplayerScope.LAN, true, port)
+*///?} else {
 fun publishForSteam(server: IntegratedServer, port: Int): Boolean =
     server.publishServer(MinecraftServer.MultiplayerScope.LAN, server.defaultGameType, true, port)
+//?}
 
 fun <T : Any> cycleButton(name: (T) -> Component, initial: T): CycleButton.Builder<T> = CycleButton.builder(name, initial)
 

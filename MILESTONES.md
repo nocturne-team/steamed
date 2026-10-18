@@ -608,6 +608,13 @@ not, members fall back to the old timeout), and friends-list "Join Game".
     - [x] Build restructure (2026-10-17): Stonecutter nodes over one `src/` tree (spec and plan in
       `docs/superpowers/`). The 26.2 jars match 0.1.4's file lists and metadata (plus the new `compat` classes and
       NeoForge's `modLoader` line); all three 26.2 Prism instances initialise Steam and reach the title screen
+    - [ ] 26.3 (Fabric, NeoForge, Quilt), 2026-10-18: `Compat26.kt`'s GLFW→SDL split (26.3 drops GLFW for SDL
+      windowing) verified against real decompiled 26.3 source, not just compile success — `SDLVideo.SDL_GetWindowTitle`
+      genuinely exists and matches `appendTitle`'s call, and `IntegratedServer.publishServer`'s real 3-arg
+      `(scope, allowCommands, port)` signature matches `publishForSteam`'s `>=26.3` branch. All three nodes
+      (`:26.3-fabric`, `:26.3-neoforge`, `:26.3-quilt`) build clean; `:26.3-fabric:test` passes all 17 tests. Not yet
+      run: an actual `runClient` smoke test (confirms Steam init boots, not just that it compiles) or any real-install
+      check. Same two-account gaps as every other version
     - [ ] 1.21.1 (Fabric, NeoForge), shipping in 0.2.0. Verified 2026-10-17: both dev clients initialise Steam and join a
       world with no mixin errors; the Fabric 1.21.1 Prism instance (Fabric API 0.116.17, FLK 1.14.1) initialises Steam
       and reaches the title screen. Still to check by hand on real installs: NeoForge 1.21.1 in Prism, the title-screen

@@ -36,6 +36,19 @@ meta.neo = "[26.2,)"
 meta.kff = "[6.4,)"
 deps.kff = "6.4.0"
 
+["26.3"]
+mod.java = "25"
+mod.mc_releases = ["26.3"]
+mod.mixins = ["AvatarRendererMixin", "ChatListenerMixin", "ConnectScreenAccessor", "IntegratedServerMixin",
+    "PauseMenuMixin", "PlayerTabOverlayMixin", "SplashManagerMixin", "TitleScreenMixin"]
+deps.fabric_api = "0.163.0+26.3"
+deps.neo = "26.3.0.88"
+meta.minecraft_fabric = "~26.3"
+meta.minecraft_neoforge = "[26.3,26.4)"
+meta.neo = "[26.3,)"
+meta.kff = "[6.4,)"
+deps.kff = "6.4.0"
+
 ["1.21.1"]
 mod.java = "21"
 mod.mc_releases = ["1.21", "1.21.1"]
