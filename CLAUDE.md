@@ -64,7 +64,10 @@ prints the payloads instead, for testing against local jars
 `.github/workflows/codeql.yml` runs CodeQL on `main`, PRs and weekly: `java-kotlin` (manual `./gradlew :26.2-fabric:classes`
 build of single nodes, to stay inside the heap, since Kotlin can't use build-mode none) and `actions`. CodeQL's Kotlin support currently ends at 2.4.20, so check it
 before bumping Kotlin. `.github/dependabot.yml` covers GitHub Actions and the Gradle versions in build files; it can't
-see `stonecutter.properties.toml`, and ignores Kotlin bumps (they have to move together with FLK)
+see `stonecutter.properties.toml`, and ignores Kotlin bumps (they have to move together with FLK). The root
+`build.gradle.kts` is intentionally empty — Dependabot's Gradle file-fetcher requires one to exist at the repo root
+before it'll look at `gradle-wrapper.properties`, even though Stonecutter itself routes every node through its own
+`build.<loader>.gradle.kts` and never touches the root one
 
 `./gradlew :26.2-fabric:test` runs the unit tests (JUnit 5 via `kotlin("test")`, in `src/test`; `build` runs them on
 every node, and so does CI). They cover pure logic only, pulled into small `internal` objects (`net/WebMapConfig.kt`, `net/VoicePorts.kt`,
