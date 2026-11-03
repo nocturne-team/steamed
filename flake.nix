@@ -17,14 +17,14 @@
             # Bootstraps ./gradlew; project subprojects pin their own
             # per-Minecraft-version JDKs via Gradle toolchains (foojay
             # auto-provisions those, so this one just needs to run Gradle).
-            pkgs.jdk21
+            pkgs.jdk25
           ];
 
-          JAVA_HOME = "${pkgs.jdk21}/lib/openjdk";
+          JAVA_HOME = "${pkgs.jdk25}/lib/openjdk";
 
           shellHook = ''
             echo "Steamed dev shell: JDK $(java -version 2>&1 | head -n1)"
-            echo "Run ./gradlew :versions:<version>-<loader>:build to build a specific target."
+            echo "Run ./gradlew :<version>-<loader>:build to build a specific target."
           '';
         };
       }
