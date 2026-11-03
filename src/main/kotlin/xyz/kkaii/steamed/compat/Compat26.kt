@@ -66,12 +66,21 @@ fun HeaderAndFooterLayout.titleHeader(title: Component, font: Font) {
     addTitleHeader(title, font)
 }
 
+//? if >=26.2 {
 fun Minecraft.currentScreen(): Screen? = gui.screen()
 fun Minecraft.show(screen: Screen) = setScreenAndShow(screen)
 fun Minecraft.closeTo(screen: Screen?) = gui.setScreen(screen)
 fun Minecraft.systemMessage(message: Component) = gui.hud.chat.addClientSystemMessage(message)
 fun Minecraft.toast(id: ToastId, title: Component, message: Component?) =
     SystemToast.addOrUpdate(gui.toastManager(), id, title, message)
+//?} else {
+/*fun Minecraft.currentScreen(): Screen? = screen
+fun Minecraft.show(screen: Screen) = setScreenAndShow(screen)
+fun Minecraft.closeTo(screen: Screen?) = setScreen(screen)
+fun Minecraft.systemMessage(message: Component) = gui.chat.addClientSystemMessage(message)
+fun Minecraft.toast(id: ToastId, title: Component, message: Component?) =
+    SystemToast.addOrUpdate(toastManager, id, title, message)
+*///?}
 fun Minecraft.disconnectTo(screen: Screen) = disconnect(screen, false)
 fun Minecraft.leaveWorld(reason: Component) = disconnectFromWorld(reason)
 //? if >=26.3 {
@@ -85,8 +94,16 @@ fun AbstractWidget.draw(graphics: Graphics, mouseX: Int, mouseY: Int, a: Float) 
     extractRenderState(graphics, mouseX, mouseY, a)
 
 private val profiles = ConcurrentHashMap<UUID, ResolvableProfile>()
+//? if >=26.2 {
 fun Graphics.face(uuid: UUID, x: Int, y: Int, size: Int) =
     PlayerFaceExtractor.extractRenderState(this, profiles.computeIfAbsent(uuid, ResolvableProfile::createUnresolved), x, y, size)
+//?} else {
+/*fun Graphics.face(uuid: UUID, x: Int, y: Int, size: Int) = PlayerFaceExtractor.extractRenderState(
+    this,
+    Minecraft.getInstance().playerSkinRenderCache().getOrDefault(profiles.computeIfAbsent(uuid, ResolvableProfile::createUnresolved)).playerSkin(),
+    x, y, size,
+)
+*///?}
 
 fun minecraftVersionName(): String = SharedConstants.getCurrentVersion().name()
 fun argb(a: Int, r: Int, g: Int, b: Int): Int = ARGB.color(a, r, g, b)
@@ -97,10 +114,13 @@ fun Style.opensUrl(url: String, hover: Component): Style =
 //? if >=26.3 {
 /*fun publishForSteam(server: IntegratedServer, port: Int): Boolean =
     server.publishServer(MinecraftServer.MultiplayerScope.LAN, true, port)
-*///?} else {
+*///?} else if >=26.2 {
 fun publishForSteam(server: IntegratedServer, port: Int): Boolean =
     server.publishServer(MinecraftServer.MultiplayerScope.LAN, server.defaultGameType, true, port)
-//?}
+//?} else {
+/*fun publishForSteam(server: IntegratedServer, port: Int): Boolean =
+    server.publishServer(server.defaultGameType, true, port)
+*///?}
 
 fun <T : Any> cycleButton(name: (T) -> Component, initial: T): CycleButton.Builder<T> = CycleButton.builder(name, initial)
 

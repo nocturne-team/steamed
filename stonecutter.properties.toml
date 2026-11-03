@@ -23,6 +23,20 @@ meta.flk = ">=1.13.14"
 meta.fabricloader = ">=0.19.5"
 meta.fabricloader_quilt = "*"
 
+["26.1"]
+mod.java = "25"
+mod.mc_releases = ["26.1", "26.1.1", "26.1.2"]
+mod.mixins = ["AvatarRendererMixin", "ChatListenerMixin", "ConnectScreenAccessor", "IntegratedServerMixin",
+    "PauseMenuMixin", "PlayerTabOverlayMixin", "SplashManagerMixin", "TitleScreenMixin"]
+# NeoForge has stable builds for 26.1.2 only
+deps.fabric_api = "0.155.3+26.1.2"
+deps.neo = "26.1.2.126"
+meta.minecraft_fabric = ">=26.1 <26.2"
+meta.minecraft_neoforge = "[26.1,26.2)"
+meta.neo = "[26.1,)"
+meta.kff = "[6.4,)"
+deps.kff = "6.4.0"
+
 ["26.2"]
 mod.java = "25"
 mod.mc_releases = ["26.2"]

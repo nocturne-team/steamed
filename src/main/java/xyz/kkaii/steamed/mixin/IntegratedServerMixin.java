@@ -17,7 +17,7 @@ import java.net.InetAddress;
 public class IntegratedServerMixin {
 	// A world hosted through Steam is only meant to be reached through the P2P relay, so keep it off the LAN.
 	@ModifyArg(
-			//? if >=26.1 {
+			//? if >=26.2 {
 			method = "publishServer(Lnet/minecraft/server/MinecraftServer$MultiplayerScope;I)Z",
 			//?} else {
 			/*method = "publishServer(Lnet/minecraft/world/level/GameType;ZI)Z",
@@ -30,7 +30,7 @@ public class IntegratedServerMixin {
 	}
 
 	@WrapOperation(
-			//? if >=26.1 {
+			//? if >=26.2 {
 			method = "publishServer(Lnet/minecraft/server/MinecraftServer$MultiplayerScope;I)Z",
 			//?} else {
 			/*method = "publishServer(Lnet/minecraft/world/level/GameType;ZI)Z",
