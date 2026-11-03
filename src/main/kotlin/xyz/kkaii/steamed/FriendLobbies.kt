@@ -16,6 +16,10 @@ object FriendLobbies {
     const val VISIBILITY_KEY = "visibility"
     const val MC_VERSION_KEY = "mc_version"
     const val MC_PROTOCOL_KEY = "mc_protocol"
+    const val PROTOCOL_KEY = "steamed_protocol"
+    // Bump when Steamed's own wire format changes (auth handshake, relay channels, lobby data). Nodes keep their
+    // own version numbers between releases, so joining is gated on this rather than on the version string.
+    const val PROTOCOL = 1
     private const val APP_ID = 480L
     private const val REQUEST_INTERVAL_MS = 10_000L
 
@@ -26,11 +30,15 @@ object FriendLobbies {
         val version: String,
         val mcVersion: String,
         val mcProtocol: String,
+        val protocol: String,
     ) {
         val sameMinecraft: Boolean get() = sameMinecraft(mcProtocol)
+        // Hosts from before PROTOCOL_KEY existed only match on the exact version.
+        val sameSteamed: Boolean get() =
+            if (protocol.isEmpty()) version == Services.PLATFORM.modVersion() else protocol == PROTOCOL.toString()
         // A different protocol doesn't need blocking when the joiner has ViaFabric: it can be handed the host's
         // protocol directly instead of auto-pinging (see ViaFabricIntegration).
-        val compatible: Boolean get() = version == Services.PLATFORM.modVersion() && (sameMinecraft || ViaFabricIntegration.isInstalled())
+        val compatible: Boolean get() = sameSteamed && (sameMinecraft || ViaFabricIntegration.isInstalled())
     }
 
     // Lobbies from before these keys existed don't say; Minecraft's own handshake still catches a mismatch.
@@ -77,6 +85,7 @@ object FriendLobbies {
                 lobby, members, matchmaking.getLobbyData(lobby, "name").orEmpty(), version,
                 matchmaking.getLobbyData(lobby, MC_VERSION_KEY).orEmpty(),
                 matchmaking.getLobbyData(lobby, MC_PROTOCOL_KEY).orEmpty(),
+                matchmaking.getLobbyData(lobby, PROTOCOL_KEY).orEmpty(),
             )
         }
     }

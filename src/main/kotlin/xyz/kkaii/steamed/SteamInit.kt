@@ -343,6 +343,7 @@ object SteamInit {
                 kv(steamId, "owner_uuid", user.profileId.toString())
                 // Marks the lobby as Steamed's among every other Spacewar (480) lobby, for FriendLobbies.
                 kv(steamId, FriendLobbies.MARKER_KEY, Services.PLATFORM.modVersion())
+                kv(steamId, FriendLobbies.PROTOCOL_KEY, FriendLobbies.PROTOCOL.toString())
                 kv(steamId, FriendLobbies.VISIBILITY_KEY, FriendLobbies.visibilityOf(Steamed.creatingLobbyType))
                 kv(steamId, FriendLobbies.MC_VERSION_KEY, minecraftVersionName())
                 kv(steamId, FriendLobbies.MC_PROTOCOL_KEY, SharedConstants.getProtocolVersion().toString())
