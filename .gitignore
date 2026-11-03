@@ -44,3 +44,10 @@ replay_*.log
 .direnv/
 result
 result-*
+
+# ai assistant
+
+.claude/
+CLAUDE.md
+AGENTS.md
+docs/superpowers/
