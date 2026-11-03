@@ -1,4 +1,4 @@
-mod.version = "0.2.2"
+mod.version = "0.2.3"
 mod.group = "xyz.kkaii.steamed"
 mod.name = "Steamed"
 mod.description = "Provides peer-to-peer networking via Steamworks™"
