@@ -9,7 +9,7 @@ pluginManagement {
         maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
     }
     plugins {
-        kotlin("jvm") version "2.4.20"
+        kotlin("jvm") version "2.4.21"
         id("net.neoforged.moddev") version "2.0.147"
         id("net.neoforged.moddev.legacyforge") version "2.0.147"
     }
